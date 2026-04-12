@@ -1,57 +1,58 @@
-# SPDX-FileCopyrightText: None
-# SPDX-License-Identifier: CC0-1.0
+name: Build System
 
-name: CI
-
-on: [push]
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
 
 env:
-  OTP_VERSION: 28.4.1
-  ELIXIR_VERSION: 1.19.5-otp-28
-  NERVES_BOOTSTRAP_VERSION: 1.15.0
-
-permissions:
-  id-token: write
-  contents: read
+  OTP_VERSION: "27.2"
+  ELIXIR_VERSION: "1.17.3-otp-27"
 
 jobs:
-  get-br-dependencies:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gridpoint-com/actions-nerves-system@v1
-      - name: Get Buildroot Dependencies
-        uses: ./.actions/get-br-dependencies
-        with:
-          otp-version: ${{ env.OTP_VERSION }}
-          elixir-version: ${{ env.ELIXIR_VERSION }}
-          nerves-bootstrap-version: ${{ env.NERVES_BOOTSTRAP_VERSION }}
-          push-to-download-site: true
-          download-site-bucket-uri: ${{ vars.DOWNLOAD_SITE_BUCKET_URI }}
-          aws-role: ${{ secrets.AWS_ROLE }}
-          aws-region: ${{ vars.AWS_REGION }}
-  build-system:
-    needs: [get-br-dependencies]
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gridpoint-com/actions-nerves-system@v1
-      - name: Build nerves_system
-        uses: ./.actions/build-system
-        with:
-          otp-version: ${{ env.OTP_VERSION }}
-          elixir-version: ${{ env.ELIXIR_VERSION }}
-          nerves-bootstrap-version: ${{ env.NERVES_BOOTSTRAP_VERSION }}
-  deploy-system:
-    needs: [build-system]
-    if: github.ref_type == 'tag'
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+  build:
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: gridpoint-com/actions-nerves-system@v1
-      - name: Deploy nerves_system
-        uses: ./.actions/deploy-system
+
+      - name: Install Buildroot dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential automake autoconf git squashfs-tools \
+            pkg-config curl wget file cpio unzip rsync bc cmake \
+            libssl-dev libncurses5-dev \
+            python3 python3-aiohttp python3-flake8 python3-ijson \
+            python3-nose2 python3-pexpect python3-pytest
+
+      - uses: erlef/setup-beam@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
+
+      - name: Install Nerves Bootstrap
+        run: mix archive.install hex nerves_bootstrap 1.15.0 --force
+
+      - name: Get dependencies
+        run: mix deps.get
+
+      - name: Build system
+        run: mix compile
+        timeout-minutes: 120
+
+      - name: Create artifact
+        run: mix nerves.artifact
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nerves-system-artifact
+          path: .nerves/artifacts/**/*.tar.gz
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: .nerves/artifacts/**/*.tar.gz
