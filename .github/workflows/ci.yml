@@ -6,12 +6,12 @@ on:
   workflow_dispatch:
 
 env:
-  OTP_VERSION: "27.2"
-  ELIXIR_VERSION: "1.17.3-otp-27"
+  OTP_VERSION: "28.0.1"
+  ELIXIR_VERSION: "1.19.3-otp-28"
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
