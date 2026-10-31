@@ -18,7 +18,7 @@ file-resource cmdline-b.txt { host-path = "${NERVES_SYSTEM}/images/cmdline-b.txt
 # Define file resources - order matters for firmware update
 file_resources = [
   %{name: "fixup4.dat", path: "${NERVES_SYSTEM}/images/rpi-firmware/fixup4x.dat"},
-  %{name: "config.txt", path: "${NERVES_SYSTEM}/images/config.txt"},
+  %{name: "config.txt", path: "${NERVES_DEFCONFIG_DIR}/config.txt"},
   %{name: "kernel8.img", path: "${NERVES_SYSTEM}/images/Image"},
   %{name: "bcm2712-rpi-5-b.dtb", path: "${NERVES_SYSTEM}/images/bcm2712-rpi-5-b.dtb"},
   %{name: "bcm2712-rpi-cm5-cm4io.dtb", path: "${NERVES_SYSTEM}/images/bcm2712-rpi-cm5-cm4io.dtb"},
@@ -40,6 +40,7 @@ file_resources = [
   %{name: "overlays/ov5647.dtbo", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/ov5647.dtbo"},
   %{name: "overlays/overlay_map.dtb", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/overlay_map.dtb"},
   %{name: "overlays/ramoops-pi4.dtbo", path: "${NERVES_SYSTEM}/images/ramoops-pi4-overlay.dtb"},
+  %{name: "overlays/led12v.dtbo", path: "${NERVES_DEFCONFIG_DIR}/led12v-overlay.dtb"},
   %{name: "overlays/rpi-backlight.dtbo", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/rpi-backlight.dtbo"},
   %{name: "overlays/rpi-ft5406.dtbo", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/rpi-ft5406.dtbo"},
   %{name: "overlays/tc358743.dtbo", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/tc358743.dtbo"},

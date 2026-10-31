@@ -43,6 +43,8 @@ SPDX-License-Identifier = "GPL-2.0-or-later"
 [[annotations]]
 path = [
  "linux-6.12.defconfig",
+ "led12v-overlay.dts",
+ "led12v-overlay.dtb",
  "ramoops-pi4-overlay.dts"
 ]
 precedence = "override"

@@ -122,6 +122,8 @@ defmodule NervesSystemRpi5.MixProject do
       "post-build.sh",
       "post-createfs.sh",
       "ramoops-pi4-overlay.dts",
+      "led12v-overlay.dts",
+      "led12v-overlay.dtb",
       "README.md",
       "REUSE.toml",
       "VERSION"

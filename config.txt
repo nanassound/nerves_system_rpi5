@@ -64,6 +64,9 @@ dtoverlay=dwc2
 # information across reboots in DRAM
 dtoverlay=ramoops
 
+# 12V LED dimming: RP1 PWM0 channel 2 on GPIO18 driving a pwm-leds device
+dtoverlay=led12v
+
 # Enable the UART (/dev/ttyAMA0)
 enable_uart=1
 
